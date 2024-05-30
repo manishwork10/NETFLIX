@@ -22,6 +22,63 @@ app.get('/movie/list', (req, res) => {
     return res.status(200).send({message:"success",movie: movieList});
 })
 
+// ? edit movie
+app.put('/movie/edit/:movieId', (req, res) => {
+    // extract movie id from req.params
+    const movieId = Number(req.params.movieId);
+  
+    // find movie in movie list using movieId
+    const requiredMovie = movieList.find((item, index, self) => {
+      if (item.id === movieId) {
+        return item;
+      }
+    });
+  
+    // if not movie, throw error
+    if (!requiredMovie) {
+      return res.status(404).send({ message: 'Movie does not exist.' });
+    }
+  
+    // extract new values from req.body
+    const newValues = req.body;
+  
+    const newMovieList = movieList.map((item, index, self) => {
+      if (item.id === movieId) {
+        return {
+          id: movieId,
+          name: newValues.name,
+          releaseYear: newValues.releaseYear,
+        };
+      } else {
+        return item;
+      }
+    });
+  
+    movieList = structuredClone(newMovieList);
+  
+    return res.status(200).send({ message: 'Movie is updated successfully.' });
+  });
+//! Delete the movies 
+
+app.delete("/movie/delete", (req, res)=>{
+  const movieToDeleted= req.body.name;
+  const requiredMovie = movieList.find((item)=> 
+  {
+    if (item.name=== movieToDeleted)
+      return item
+  })
+  if(!requiredMovie)
+    return res.status(404).send({ message: "Movie doesn't exist"});
+ 
+
+const nenMovieList = movieList.filter((item, index, array) => {
+  if (item.name !== movieToDeleted) {
+    return item;
+  }
+});
+movieList= structuredClone(nenMovieList)
+return res.status(200).send({ message: "Movies is deleted successfully."})
+})
 
 // network port and server 
 const PORT = 8001;
